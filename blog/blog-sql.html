@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>SQL Mohamed Chnafy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Polices de caractères -->
+    <link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,400i,700" rel="stylesheet">
+    
+    <!-- Fichiers CSS -->
+    <link rel="stylesheet" href="css/animate.css">
+    <link rel="stylesheet" href="css/icomoon.css">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/flexslider.css">
+    <link rel="stylesheet" href="css/owl.carousel.min.css">
+    <link rel="stylesheet" href="css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Prism.js pour la coloration syntaxique -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-sql.min.js"></script>
+
+    <script src="js/modernizr-2.6.2.min.js"></script>
+    
+    <!-- Styles supplémentaires -->
+    <style>
+        body {
+            font-family: 'Quicksand', Arial, sans-serif;
+            font-weight: 400;
+            font-size: 15px;
+            line-height: 1.8;
+            color: rgba(0, 0, 0, 0.7);
+        }
+        h1, h2, h3, h4, h5, h6 {
+            color: #000;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-weight: 400;
+            margin: 0 0 30px 0;
+        }
+        pre {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            color: #333;
+        }
+        #sqlQuery {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        #queryResults {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            padding: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="colorlib-page">
+        <div class="container-wrap">
+            <div id="colorlib-main">
+                <section class="colorlib-blog" data-section="blog">
+                    <div class="colorlib-narrow-content">
+                        <div class="row">
+                            <div class="col-md-12 animate-box" data-animate-effect="fadeInLeft">
+                                <div class="blog-entry">
+                                    <div class="desc">
+                                        <h2 class="colorlib-heading">Maîtrise avancée du SQL</h2>
+                                        
+                                        <h3>1. Introduction au SQL et modélisation des données</h3>
+                                        
+                                        <p>Le SQL (Structured Query Language) est le langage standard pour interagir avec les bases de données relationnelles. Dans cet article, nous allons explorer en profondeur les capacités du SQL en utilisant un jeu de données cohérent tout au long de nos exemples.</p>
+
+                                        <h4>1.1 Modélisation de notre base de données e-commerce</h4>
+
+                                        <p>Commençons par modéliser une base de données pour une plateforme de commerce électronique. Cette base de données nous servira d'exemple tout au long de cet article.</p>
+
+                                        <pre><code class="language-sql">-- Table des utilisateurs
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    date_of_birth DATE,
+    registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP
+);
+
+-- Table des produits
+CREATE TABLE products (
+    product_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2) NOT NULL,
+    stock_quantity INT NOT NULL,
+    category_id INT,
+    FOREIGN KEY (category_id) REFERENCES categories(category_id)
+);
+
+-- Table des catégories
+CREATE TABLE categories (
+    category_id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    parent_category_id INT,
+    FOREIGN KEY (parent_category_id) REFERENCES categories(category_id)
+);
+
+-- Table des commandes
+CREATE TABLE orders (
+    order_id SERIAL PRIMARY KEY,
+    user_id INT,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+-- Table des détails de commande
+CREATE TABLE order_items (
+    order_item_id SERIAL PRIMARY KEY,
+    order_id INT,
+    product_id INT,
+    quantity INT NOT NULL,
+    price_per_unit DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+-- Table des avis
+CREATE TABLE reviews (
+    review_id SERIAL PRIMARY KEY,
+    product_id INT,
+    user_id INT,
+    rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    comment TEXT,
+    review_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(product_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);</code></pre>
+
+                                        <p><strong>Astuce</strong> : Lors de la conception de votre schéma, pensez toujours à l'intégrité référentielle. Les clés étrangères nous aident à maintenir la cohérence des données entre les tables.</p>
+
+                                        <h4>1.2 Insertion de données de test</h4>
+
+                                        <pre><code class="language-sql">-- Insertion de catégories
+INSERT INTO categories (name) VALUES 
+('Électronique'), ('Vêtements'), ('Livres');
+
+-- Insertion de produits
+INSERT INTO products (name, description, price, stock_quantity, category_id) VALUES
+('Smartphone XYZ', 'Dernier modèle avec caméra 108MP', 999.99, 50, 1),
+('T-shirt cool', '100% coton, plusieurs couleurs', 19.99, 100, 2),
+('SQL pour les nuls', 'Apprenez SQL facilement', 29.99, 75, 3);
+
+-- Insertion d'utilisateurs
+INSERT INTO users (username, email, password_hash, date_of_birth) VALUES
+('john_doe', 'john@example.com', 'hashed_password', '1990-01-15'),
+('jane_smith', 'jane@example.com', 'hashed_password', '1985-05-20');
+
+-- Insertion de commandes
+INSERT INTO orders (user_id, total_amount, status) VALUES
+(1, 1019.98, 'Completed'),
+(2, 29.99, 'Processing');
+
+-- Insertion de détails de commande
+INSERT INTO order_items (order_id, product_id, quantity, price_per_unit) VALUES
+(1, 1, 1, 999.99),
+(1, 2, 1, 19.99),
+(2, 3, 1, 29.99);
+
+-- Insertion d'avis
+INSERT INTO reviews (product_id, user_id, rating, comment) VALUES
+(1, 1, 5, 'Excellent smartphone, je recommande !'),
+(2, 2, 4, 'Bon t-shirt, mais taille un peu petite');</code></pre>
+
+                                        <p><strong>Astuce</strong> : Lors de l'insertion de données de test, essayez de couvrir différents scénarios pour vous assurer que vos futures requêtes fonctionneront correctement dans diverses situations.</p>
+
+                                        <h4>1.3 Requêtes de base</h4>
+
+                                        <pre><code class="language-sql">-- Sélectionner tous les produits
+SELECT * FROM products;
+
+-- Sélectionner les noms et prix des produits de la catégorie 'Électronique'
+SELECT p.name, p.price
+FROM products p
+JOIN categories c ON p.category_id = c.category_id
+WHERE c.name = 'Électronique';
+
+-- Calculer le nombre total de commandes par utilisateur
+SELECT u.username, COUNT(o.order_id) as order_count
+FROM users u
+LEFT JOIN orders o ON u.user_id = o.user_id
+GROUP BY u.user_id, u.username
+ORDER BY order_count DESC;</code></pre>
+
+                                        <p><strong>Astuce</strong> : L'utilisation d'alias (comme 'p' pour products et 'c' pour categories) rend vos requêtes plus lisibles, surtout lorsqu'elles deviennent complexes.</p>
+
+                                        <h3>2. Requêtes avancées et optimisation</h3>
+
+                                        <h4>2.1 Sous-requêtes et requêtes corrélées</h4>
+
+                                        <pre><code class="language-sql">-- Trouver les produits plus chers que la moyenne
+SELECT name, price
+FROM products
+WHERE price > (SELECT AVG(price) FROM products);
+
+-- Lister les utilisateurs qui ont fait des achats supérieurs à la moyenne
+SELECT u.username, o.total_amount
+FROM users u
+JOIN orders o ON u.user_id = o.user_id
+WHERE o.total_amount > (
+    SELECT AVG(total_amount)
+    FROM orders
+);</code></pre>
+
+                                        <p><strong>Astuce</strong> : Les sous-requêtes peuvent parfois être remplacées par des jointures pour de meilleures performances, surtout sur de grands ensembles de données.</p>
+
+                                        <h4>2.2 Fonctions de fenêtrage (Window Functions)</h4>
+
+                                        <pre><code class="language-sql">-- Classement des produits par prix dans chaque catégorie
+SELECT 
+    name,
+    category_id,
+    price,
+    RANK() OVER (PARTITION BY category_id ORDER BY price DESC) as price_rank
+FROM products;
+
+-- Calcul de la moyenne mobile des ventes sur 3 jours
+SELECT 
+    order_date,
+    total_amount,
+    AVG(total_amount) OVER (
+        ORDER BY order_date
+        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+    ) as moving_avg
+FROM orders
+ORDER BY order_date;</code></pre>
+
+                                        <p><strong>Astuce</strong> : Les fonctions de fenêtrage sont extrêmement puissantes pour l'analyse de données, permettant des calculs complexes sans avoir recours à des jointures coûteuses.</p>
+
+                                        <h4>2.3 Optimisation des performances</h4>
+
+                                        <pre><code class="language-sql">-- Création d'un index pour améliorer les performances des recherches
+CREATE INDEX idx_product_name ON products(name);
+
+-- Utilisation de EXPLAIN pour analyser l'exécution d'une requête
+EXPLAIN ANALYZE
+SELECT p.name, c.name as category, p.price
+FROM products p
+JOIN categories c ON p.category_id = c.category_id
+WHERE p.price > 100
+ORDER BY p.price DESC;</code></pre>
+
+                                        <p><strong>Astuce</strong> : Toujours tester les performances des requêtes avec un jeu de données représentatif. Ce qui fonctionne bien sur un petit ensemble peut ne pas être optimal sur de grandes quantités de données.</p>
+
+                                        <h3>3. Fonctionnalités avancées du SQL</h3>
+
+                                        <h4>3.1 Vues et vues matérialisées</h4>
+
+                                        <pre><code class="language-sql">-- Création d'une vue pour les meilleures ventes
+CREATE VIEW top_selling_products AS
+SELECT p.name, SUM(oi.quantity) as total_sold
+FROM products p
+JOIN order_items oi ON p.product_id = oi.product_id
+GROUP BY p.product_id, p.name
+ORDER BY total_sold DESC
+LIMIT 10;
+
+-- Utilisation de la vue
+SELECT * FROM top_selling_products;</code></pre>
+
+                                        <p><strong>Astuce</strong> : Les vues peuvent simplifier des requêtes complexes et aider à maintenir la cohérence dans vos analyses.</p>
+
+                                        <h4>3.2 Procédures stockées et fonctions</h4>
+
+                                        <pre><code class="language-sql">-- Création d'une fonction pour calculer le total des ventes d'un produit
+CREATE FUNCTION get_total_sales(product_id_param INT) 
+RETURNS DECIMAL(10,2) AS $$
+DECLARE
+    total_sales DECIMAL(10,2);
+BEGIN
+    SELECT COALESCE(SUM(oi.quantity * oi.price_per_unit), 0)
+    INTO total_sales
+    FROM order_items oi
+    WHERE oi.product_id = product_id_param;
+    
+    RETURN total_sales;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Utilisation de la fonction
+SELECT name, get_total_sales(product_id) as total_sales
+FROM products;</code></pre>
+
+                                        <p><strong>Astuce</strong> : Les procédures stockées et les fonctions peuvent améliorer les performances en réduisant le trafic réseau et en permettant la réutilisation du code.</p>
+
+                                        <h4>3.3 Transactions et contrôle de concurrence</h4>
+
+                                        <pre><code class="language-sql">-- Exemple de transaction pour un processus de commande
+BEGIN;
+
+-- Mise à jour du stock
+UPDATE products
+SET stock_quantity = stock_quantity - 1
+WHERE product_id = 1;
+
+-- Insertion de la nouvelle commande
+INSERT INTO orders (user_id, total_amount, status)
+VALUES (1, 999.99, 'Processing');
+
+-- Insertion du détail de la commande
+INSERT INTO order_items (order_id, product_id, quantity, price_per_unit)
+VALUES (LASTVAL(), 1, 1, 999.99);
+
+COMMIT;</code></pre>
+
+                                        <p><strong>Astuce</strong> : Utilisez toujours des transactions pour les opérations qui impliquent plusieurs modifications liées. Cela garantit la cohérence des données même en cas d'erreur ou de conflit.</p>
+
+                                        <h4>3.4 Gestion des verrous et isolation</h4>
+
+                                        <pre><code class="language-sql">-- Exemple de verrouillage explicite
+BEGIN;
+
+-- Verrouillage de la ligne du produit
+SELECT * FROM products
+WHERE product_id = 1
+FOR UPDATE;
+
+-- Mise à jour du stock
+UPDATE products
+SET stock_quantity = stock_quantity - 1
+WHERE product_id = 1;
+
+COMMIT;</code></pre>
+
+                                        <p><strong>Astuce</strong> : Soyez prudent avec les verrous explicites. Mal utilisés, ils peuvent causer des problèmes de performance ou des interblocages (deadlocks).</p>
+
+                                        <h3>4. SQL avancé pour l'analyse de données</h3>
+
+                                        <h4>4.1 Requêtes récursives avec Common Table Expressions (CTE)</h4>
+
+                                        <pre><code class="language-sql">-- Exemple : Trouver tous les sous-catégories d'une catégorie
+WITH RECURSIVE category_tree AS (
+    -- Cas de base : la catégorie de départ
+    SELECT category_id, name, parent_category_id, 1 AS level
+    FROM categories
+    WHERE name = 'Électronique'
+    
+    UNION ALL
+    
+    -- Partie récursive : trouver les enfants
+    SELECT c.category_id, c.name, c.parent_category_id, ct.level + 1
+    FROM categories c
+    JOIN category_tree ct ON c.parent_category_id = ct.category_id
+)
+SELECT * FROM category_tree;</code></pre>
+
+                                        <p><strong>Astuce</strong> : Les CTE récursives sont excellentes pour explorer des relations parent-enfant, mais attention à la profondeur de récursion pour éviter les boucles infinies.</p>
+
+                                        <h4>4.2 Fonctions d'agrégation avancées</h4>
+
+                                        <pre><code class="language-sql">-- Exemple : Analyse des ventes avec des agrégations avancées
+SELECT 
+    DATE_TRUNC('month', o.order_date) as month,
+    c.name as category,
+    COUNT(DISTINCT o.order_id) as num_orders,
+    SUM(oi.quantity * oi.price_per_unit) as total_sales,
+    AVG(oi.quantity * oi.price_per_unit) as avg_order_value,
+    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY oi.quantity * oi.price_per_unit) as median_order_value
+FROM orders o
+JOIN order_items oi ON o.order_id = oi.order_id
+JOIN products p ON oi.product_id = p.product_id
+JOIN categories c ON p.category_id = c.category_id
+GROUP BY DATE_TRUNC('month', o.order_date), c.name
+ORDER BY month, total_sales DESC;</code></pre>
+
+                                        <p><strong>Astuce</strong> : Les fonctions comme PERCENTILE_CONT peuvent être très utiles pour des analyses statistiques directement en SQL, réduisant le besoin de post-traitement dans d'autres outils.</p>
+
+                                        <h4>4.3 Pivotement de données (PIVOT)</h4>
+
+                                        <pre><code class="language-sql">-- Exemple : Ventes par catégorie et par trimestre (PostgreSQL)
+SELECT *
+FROM crosstab(
+    'SELECT 
+        c.name,
+        EXTRACT(QUARTER FROM o.order_date) as quarter,
+        SUM(oi.quantity * oi.price_per_unit) as sales
+    FROM categories c
+    JOIN products p ON c.category_id = p.category_id
+    JOIN order_items oi ON p.product_id = oi.product_id
+    JOIN orders o ON oi.order_id = o.order_id
+    GROUP BY c.name, EXTRACT(QUARTER FROM o.order_date)
+    ORDER BY c.name, quarter',
+    'SELECT generate_series(1,4)'
+) AS (
+    category VARCHAR,
+    "Q1" NUMERIC,
+    "Q2" NUMERIC,
+    "Q3" NUMERIC,
+    "Q4" NUMERIC
+);</code></pre>
+
+                                        <p><strong>Astuce</strong> : Le pivotement peut grandement simplifier la création de rapports, mais la syntaxe varie selon les SGBD. Certains, comme SQL Server, ont une clause PIVOT native.</p>
+
+                                        <h3>5. Conclusion et perspectives</h3>
+
+                                        <p>Le SQL est un langage puissant et flexible qui continue d'évoluer. Avec l'avènement du Big Data et de l'IA, de nouvelles extensions SQL émergent :</p>
+
+                                        <ul>
+                                            <li><strong>SQL pour Big Data</strong> : Des outils comme Apache Hive et Presto étendent SQL aux environnements de Big Data.</li>
+                                            <li><strong>SQL et Machine Learning</strong> : Des bases de données comme PostgreSQL avec ses extensions MADlib intègrent des capacités d'apprentissage automatique directement dans SQL.</li>
+                                            <li><strong>SQL temps réel</strong> : Des systèmes comme Apache Flink SQL permettent le traitement de flux en temps réel avec une syntaxe SQL.</li>
+                                        </ul>
+
+                                        <p>Maîtriser SQL, de ses bases à ses fonctionnalités avancées, reste une compétence cruciale pour tout professionnel des données. Continuez à explorer et à pratiquer pour tirer le meilleur parti de cet outil puissant.</p>
+
+                                        <h3>6. Testez vos connaissances SQL</h3>
+
+                                        <p>Essayez d'écrire et d'exécuter vos propres requêtes SQL sur notre base de données e-commerce simulée :</p>
+
+                                        <textarea id="sqlQuery" rows="4" cols="50">SELECT * FROM products;</textarea>
+                                        <button onclick="executeQuery()">Exécuter la requête</button>
+
+                                        <h4>Résultats :</h4>
+                                        <pre id="queryResults"></pre>
+
+                                        <script>
+                                        // Simulation d'une base de données simplifiée
+                                        const db = {
+                                            products: [
+                                                { id: 1, name: "Smartphone XYZ", price: 999.99, category_id: 1 },
+                                                { id: 2, name: "T-shirt cool", price: 19.99, category_id: 2 },
+                                                { id: 3, name: "SQL pour les nuls", price: 29.99, category_id: 3 }
+                                            ],
+                                            categories: [
+                                                { id: 1, name: "Électronique" },
+                                                { id: 2, name: "Vêtements" },
+                                                { id: 3, name: "Livres" }
+                                            ],
+                                            users: [
+                                                { id: 1, username: "john_doe", email: "john@example.com" },
+                                                { id: 2, username: "jane_smith", email: "jane@example.com" }
+                                            ],
+                                            orders: [
+                                                { id: 1, user_id: 1, total_amount: 1019.98, status: "Completed" },
+                                                { id: 2, user_id: 2, total_amount: 29.99, status: "Processing" }
+                                            ]
+                                        };
+
+                                        function executeQuery() {
+                                            const query = document.getElementById('sqlQuery').value.toLowerCase();
+                                            let result = '';
+
+                                            try {
+                                                if (query.includes('select')) {
+                                                    const tableName = query.split('from')[1].trim().split(' ')[0];
+                                                    result = JSON.stringify(db[tableName], null, 2);
+                                                } else {
+                                                    result = "Seules les requêtes SELECT sont supportées dans cette démo.";
+                                                }
+                                            } catch (error) {
+                                                result = "Erreur dans la requête. Vérifiez la syntaxe.";
+                                            }
+
+                                            document.getElementById('queryResults').textContent = result;
+                                        }
+
+                                        function tryQuery(query) {
+                                            document.getElementById('sqlQuery').value = query;
+                                            executeQuery();
+                                        }
+                                        </script>
+
+                                        <p><strong>Astuce finale</strong> : La meilleure façon d'apprendre SQL est de pratiquer régulièrement sur des données réelles. Créez vos propres projets, participez à des défis en ligne, et n'hésitez pas à explorer les fonctionnalités spécifiques de différents SGBD.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts JS -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.easing.1.3.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.waypoints.min.js"></script>
+    <script src="js/jquery.flexslider-min.js"></script>
+    <script src="js/owl.carousel.min.js"></script>
+    <script src="js/jquery.countTo.js"></script>
+    <script src="js/main.js"></script>
+    
+    <!-- Activation de Prism.js -->
+    <script>
+        Prism.highlightAll();
+    </script>
+</body>
+</html>

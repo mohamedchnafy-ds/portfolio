@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse spatiale et simulation de processus ponctuels</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1, h2, h3 { color: #2c3e50; }
+        .equation { display: block; text-align: center; margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <h1>Analyse spatiale et simulation de processus ponctuels</h1>
+
+    <h2>1. Procédure de simulation</h2>
+    <p>
+        L'étude de certains phénomènes implique l'analyse de données concentrées en grappes autour de points d'intérêt précis. Cette spécificité nous conduit à considérer des modèles de processus ponctuels spécifiques pour décrire ces configurations spatiales. Les processus d'agrégation constituent une famille importante de modèles de processus ponctuels adaptés à la description de l'agrégation de points.
+    </p>
+
+    <h2>2. Processus de Matérn</h2>
+    <p>
+        Le processus de Matérn est défini comme suit :
+    </p>
+    <ul>
+        <li>Soit \(N_1\) un processus de Poisson homogène d'intensité \(\lambda_p > 0\) sur \(\mathbb{R}^2\).</li>
+        <li>Les points de \(N_1\) sont appelés points parents.</li>
+        <li>Chaque point parent est le centre d'un disque \(D_i\) de rayon \(R \in\mathbb{R}_*^+\).</li>
+        <li>Dans chaque disque \(D_i\), un processus de Poisson d'intensité \(\lambda_c\) génère des points enfants.</li>
+        <li>L'ensemble des points enfants forme le processus de cluster de Matérn.</li>
+    </ul>
+    <p>
+        Dans notre étude, nous ne considérons que les points enfants inclus dans un carré \(B\) de côté \(a > 0\). Il est important de noter que des points parents en dehors de \(B\) peuvent avoir des points enfants dans \(B\). On note \(B^+\) le carré élargi contenant ces points parents extérieurs.
+    </p>
+
+    <h3>2.1 Modélisation des points parents</h3>
+    <p>
+        La variable aléatoire \(N_1(B)\) représentant le nombre de points du processus \(N_1\) dans le carré \(B\) suit une loi de Poisson de paramètre \(\lambda_p|B|\), où \(|B|\) est l'aire de \(B\). Le nombre moyen de points parents dans \(B\) est donné par :
+    </p>
+    <div class="equation">
+        \[\bar{n}_p = \mathbb{E}[N_1(B)] = \lambda_p\, |B|\]
+    </div>
+
+    <h3>2.2 Modélisation des points enfants</h3>
+    <p>
+        Pour modéliser le nombre de points fils dans chaque disque \(D_i(\xi_i, R)\), on considère \(N_2(D_1),...N_2(D_{n_p})\) une famille de processus aléatoires de même loi, une loi de Poisson homogène de paramètre \(\lambda_c\, |D_i|=\lambda_c \pi R^2\). Le nombre moyen de points enfants \(\bar{n}_c\) dans le disque \(D_i(\xi_i, R)\) est donné par :
+    </p>
+    <div class="equation">
+        \[\bar{n}_c = \mathbb{E}[N_2(D_i)] = \lambda_c \pi R^2\]
+    </div>
+    <p>
+        Pour chaque point parent, la densité de la loi conditionnelle d'un point enfant à l'intérieur du disque \(D_i\) centré en \(\xi_i\) et de rayon \(R\) est donnée par :
+    </p>
+    <div class="equation">
+        \[f(u\,|\,\xi_i) = \frac{1}{\pi R^2}\mathbb{1}_{[0,R]}\left(\left\Vert u - \xi_i \right\Vert\right)\]
+    </div>
+
+    <h3>2.3 Espérance du nombre de points parents avec au moins un enfant</h3>
+    <p>
+        Soit \(N_{>0}\) la variable aléatoire représentant le nombre de points parents dans la région \(B\) avec au moins un enfant. La probabilité qu'un point parent ait au moins un point enfant est :
+    </p>
+    <div class="equation">
+        \[p = \mathbb{P}(N_2(D_i) \geq 1) = 1- \exp(-\lambda_c \pi R^2)\]
+    </div>
+    <p>
+        En utilisant la propriété de <i>thinning</i>, on peut montrer que la variable aléatoire \(N_{>0}\) suit une loi de Poisson de paramètre \(p\lambda_p |B|\). On en déduit donc que :
+    </p>
+    <div class="equation">
+        \[\mathbb{E}[N_{>0}] =  p\lambda_p |B|\]
+    </div>
+
+    <h3>2.4 Distance moyenne d'un point enfant à un point parent</h3>
+    <p>
+        Soit \(u\in \mathbb{R}^2\) et \(\xi_i  \in \mathbb{R}^2\). Soit \(U\) une variable aléatoire qui admet pour densité \(f(\cdot|\xi_i)\). La distance moyenne d'un point enfant \(u\) sachant un point parent \(\xi_i\) est donnée par :
+    </p>
+    <div class="equation">
+        \[\begin{aligned}
+        \mathbb{E}[||U-\xi_i||\,|\,\xi_i] &= \int_{\mathbb{R}} \int_{\mathbb{R}} ||u-\xi_i||\,f(u|\xi_i)\,du_1\,du_2 \\
+        &= \frac{1}{\pi R^2} \int_{D(\xi_i,R)} ||u-\xi_i||\,du \\
+        &= \frac{2R}{3}
+        \end{aligned}\]
+    </div>
+
+    <h3>2.5 Distance moyenne entre deux points enfants</h3>
+    <p>
+        Pour deux points enfants du même point parent, la densité de leur distance \(X\) est donnée par :
+    </p>
+    <div class="equation">
+        \[f_X(x) = \frac{4x}{\pi R^2}\left(\arccos\left(\frac{x}{2R}\right)- \frac{x}{2R}\sqrt{1-\frac{x^2}{4R^2}}\right)\]
+    </div>
+    <p>
+        avec \(0 \leq x \leq 2R\). La distance moyenne entre deux points enfants d'un même disque \(D_i\) est de \(\frac{128R}{45\pi}\).
+    </p>
+
+    <h2>4. Estimation du rayon R</h2>
+    <h3>4.1 Distance maximale entre deux points de la même grappe</h3>
+    <p>
+        L'estimateur du rayon \(R\) que nous avons choisi est :
+    </p>
+    <div class="equation">
+        \[\hat{R} = \frac{1}{2n_g} \sum_{i=1}^{n_g} d_{max_i}\]
+    </div>
+    <p>
+        où \(n_g\) est le nombre de grappes et \(d_{max_i}\) est la distance maximale entre deux points de la grappe \(i\).
+    </p>
+
+    <h3>4.2 Problème du cercle minimum</h3>
+    <p>
+        Le problème du cercle minimum consiste à trouver le plus petit cercle contenant un ensemble de points. En utilisant l'algorithme de Welzl, nous obtenons \(\hat{R} \approx 17m\) pour les données de Lille.
+    </p>
+
+    <h2>5. Modèle additif généralisé et krigeage résiduel</h2>
+    <h3>5.1 Modèle additif généralisé (GAMLSS)</h3>
+    <p>
+        Le modèle GAMLSS utilise deux variables : \(x\) (longitude) et \(y\) (latitude). La moyenne \(\mu(s)\) et l'écart-type \(\sigma(s)\) de \(Z(\cdot)\) s'écrivent :
+    </p>
+    <div class="equation">
+        \[\begin{aligned}
+        \log(\mu(s)) &= f_1(x,y) \\
+        \log(\sigma(s)) &= f_2(x,y)
+        \end{aligned}\]
+    </div>
+    <p>
+        où \(f_1\) et \(f_2\) sont des fonctions de lissage bivariées construites à l'aide d'une base par produit tensoriel.
+    </p>
+
+    <h1>Modèle additif généralisé et krigeage résiduel</h1>
+
+    <p>
+        Dans la suite, nous considérons un champ aléatoire \(Z(\cdot)\) défini sur \(\mathbb R^2\) et nous supposons observer une réalisation discrétisée, i.e. une réalisation de \(Z(s_1),\ldots,Z(s_n)\) avec \(s_1,\ldots,s_n\in \mathbb R^2\). La position géographique \(s=(x,y)\in\mathbb R^2\) est la position à laquelle est réalisée un sondage.
+    </p>
+
+    <h2>Modèle additif généralisé</h2>
+    <p>
+        Le modèle GAMLSS est obtenu en utilisant deux variables : \(x\) (longitude) et \(y\) (latitude). La moyenne \(\mu(s)\) et l'écart-type \(\sigma(s)\) de \(Z(\cdot)\) s'écrivent :
+    </p>
+    <div>
+        \[\begin{array}{lcl}
+        \log(\mu(s)) & = & f_1(x,y) \\
+        \log(\sigma(s)) & = & f_2(x,y)
+        \end{array}\]
+    </div>
+    <p>
+        Nous avons choisi la fonction lien logarithmique pour la moyenne et la variance. Pour tester les potentielles interactions entre la variable \(x\) et \(y\), nous avons choisi \(f_1\) et \(f_2\) deux fonctions de lissages bivariées construites à l'aide d'une base par produit tensoriel.
+    </p>
+
+    <h2>Krigeage résiduel</h2>
+    <p>
+        Rappelons la méthode du krigeage résiduel que nous avons utilisée. Dans la procédure du krigeage résiduel, au lieu de kriger le champ \(Z(\cdot)\) directement, on applique tout d'abord la méthode GAMLSS en utilisant les variables explicatives \((x,y)\) puis un krigeage aux résidus de la méthode GAMLSS. Le modèle GAMLSS s'écrit comme suit :
+    </p>
+    <div>
+        \[ Z(s_0) = \mu(s_0) + \sigma(s_0)\epsilon(s_0) \]
+    </div>
+    <p>
+        où \(\sigma(\cdot)\) est l'écart-type du champ aléatoire \(Z(\cdot)\) et \(\epsilon(\cdot)\) est un champ gaussien centré réduit.
+    </p>
+
+    <p>
+        De manière générale, les étapes du krigeage résiduel sont :
+    </p>
+    <ol>
+        <li>estimer la moyenne \(\mu(s) = \mathbb{E}[Z(s)]\) du champ \(Z(\cdot)\) par \(\hat{\mu}(s)\) et l'écart-type du champ \(Z(\cdot)\) par \(\hat{\sigma}_{GAM}(s)\) en utilisant la méthode GAMLSS ;</li>
+        <li>calculer le résidu \(R(s_i) = \frac{Z(s_i) - \hat{\mu}(s_i)}{\hat{\sigma}_{GAM}(s_i)}\) de la méthode en toutes positions observées \(s_i\), \(i=1,\cdots,n\) ;</li>
+        <li>construire le variogramme empirique des résidus, construire un modèle valide et ajuster celui-ci ;</li>
+        <li>effectuer un krigeage ordinaire sur les résidus obtenus en réalisant la prédiction \(\hat{R}(s_0)\) du résidu au point \(s_0\) non observé ;</li>
+        <li>la prédiction finale au point \(s_0\) est :
+            \[ \hat{Z}(s_0) = \hat{\mu}(s_0) + \hat{\sigma}_{GAM}(s_0) \times \hat{R}(s_0).\]
+        </li>
+    </ol>
+
+    <p>
+        La variance du krigeage résiduel combiné avec la méthode GAMLSS est donnée par :
+    </p>
+    <div>
+        \[\begin{array}{lcl}
+        \sigma^2_{GAMRK}(s_0) & = & \textrm{Var}\left( \hat{Z}(s_0) - Z(s_0) \right) \\[0.3cm]
+        & = & \mathbb{E}\left( \textrm{Var}\left(\hat{Z}(s_0) - Z(s_0) | \hat{\mu}, \hat{\sigma}_{GAM} \right) \right) + \textrm{Var}\left( \mathbb{E}\left( \hat{Z}(s_0) - Z(s_0) | \hat{\mu}, \hat{\sigma}_{GAM}\right)\right)\\[0.3cm]
+        & = & \mathbb{E}\left( \textrm{Var}\left(\hat{\sigma}_{GAM}(s_0) \left( \hat{R}(s_0) - R(s_0)\right) | \hat{\mu}, \hat{\sigma}_{GAM} \right) \right) \\[0.3cm]
+        & + & \textrm{Var}\left( \mathbb{E}\left( \hat{\sigma}_{GAM}(s_0) \left( \hat{R}(s_0) - R(s_0) | \hat{\mu}, \hat{\sigma}_{GAM} \right) \right) \right)
+        \end{array}\]
+    </div>
+
+    <p>
+        En supposant que l'estimateur de la variance du GAMLSS est indépendant de la prédiction \(\hat{R}(s_0)\), on obtient que :
+    </p>
+    <div>
+        \[\begin{array}{lcl}
+        \textrm{Var}\left( \mathbb{E}\left( \hat{\sigma}_{GAM}(s_0) \left( \hat{R}(s_0) - R(s_0) | \hat{\mu}, \hat{\sigma}_{GAM} \right) \right) \right) & = & \textrm{Var}\left( \mathbb{E}\left( \hat{\sigma}_{GAM}(s_0) \right) \mathbb{E} \left( \hat{R}(s_0) - R(s_0) | \hat{\mu}, \hat{\sigma}_{GAM} \right) \right)
+        \end{array}\]
+    </div>
+
+    <p>
+        Si l'on suppose que le processus \(R(\cdot)\) est stationnaire d'ordre 2, on a alors que \(\mathbb{E} \left( \hat{R}(s_0) - R(s_0)\right) = 0\). La variance du krigeage résiduel s'écrit :
+    </p>
+    <div>
+        \[\begin{array}{lcl}
+        \sigma^2_{GAMRK}(s_0) & = & \mathbb{E}\left( \textrm{Var}\left(\hat{\sigma}_{GAM}(s_0) \left( \hat{R}(s_0) - R(s_0)\right) | \hat{\mu}, \hat{\sigma}_{GAM}\right) \right) \\[0.3cm]
+        & = & \mathbb{E}\left(\hat{\sigma}^2_{GAM}(s_0) \textrm{Var}\left( \hat{R}(s_0) - R(s_0)| \hat{\mu}, \hat{\sigma}_{GAM} \right) \right)
+        \end{array}\]
+    </div>
+    <h2>6. Validation croisée et critères de validation</h2>
+    <p>
+        La validation croisée "par grappe" consiste à retirer tous les points enfants d'une grappe, puis à entraîner le modèle sur le nouvel échantillon ainsi créé et à prédire les valeurs correspondantes aux points fils de la grappe retirée.
+    </p>
+    <h3>6.1 Critères de validation</h3>
+    <ul>
+        <li>RMSE (Root Mean Square Error) : 
+            \[\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n}(\hat{Z}_{-\textbf{i}}(s_i)-Z(s_i))^{2}}\]
+        </li>
+        <li>Coefficient de prédictivité (\(Q^2\)) :
+            \[Q^2 = 1 - \frac{\sum_{i=1}^{n}(\hat{Z}_{-\textbf{i}}(s_i)-Z(s_i))^{2}}{\sum_{i=1}^{n}(Z(s_i)-\frac{1}{n}\sum_{j=1}^n Z(s_j))^{2}}\]
+        </li>
+        <li>PVA (Predictive Variance Adequacy) :
+            \[\text{PVA} = \left|\log\left(\frac{1}{n} \sum_{i=1}^n \frac{(Z(s_i) - \hat{Z}_{-\textbf{i}}(s_i))^2}{\hat{\sigma}_{-\textbf{i}}^2(s_i)}\right)\right|\]
+        </li>
+        <li>\(\alpha\)-CI plot</li>
+        <li>MSE\(_\alpha\)</li>
+    </ul>
+
+    <h2>7. Simulation</h2>
+    <h2>Simulation</h2>
+
+    <p>
+        Nous entreprenons une étude des différentes configurations spatiales possibles en effectuant des simulations de trois types différents :
+    </p>
+    <ol>
+        <li>Simulations stationnaires de deuxième ordre pour étudier l'effet de la stationnarité sur les résultats obtenus.</li>
+        <li>Simulations non stationnaires avec une moyenne non constante, pour évaluer l'influence de la non-constance de la moyenne sur les résultats obtenus.</li>
+        <li>Simulations non stationnaires avec une moyenne et une variance non constantes, pour évaluer l'effet combiné de ces deux facteurs sur les résultats.</li>
+    </ol>
+
+    <h3>Simulations stationnaires</h3>
+    <p>
+        Dans cette partie, le champ gaussien \(Z(\cdot)\) est supposé stationnaire à l'ordre 2. Le modèle pour le champ \(Z(\cdot)\) s'écrit :
+    </p>
+    <div class="equation">
+        \[ \forall s \in \mathbb{R}^2, \,Z(s) = \mu  + \sigma \,\varepsilon(s), \]
+    </div>
+    <p>
+        avec \(\mu \in \mathbb{R}\) la moyenne constante de \(Z(\cdot)\); \(\varepsilon(\cdot)\) est un champ aléatoire gaussien d'espérance nulle, stationnaire à l'ordre 2 et tel que :
+    </p>
+    <div class="equation">
+        \[ \forall s \in \mathbb{R}^2, \, \textrm{Var}\left[\varepsilon(s) \right] = 1. \]
+    </div>
+    <p>
+        Nous supposons que le champ \(\varepsilon\) a pour variogramme un variogramme sphérique \(\gamma_{\varepsilon}\) défini par :
+    </p>
+    <div class="equation">
+        \[
+        \gamma_{\varepsilon}(h) = \left\{
+            \begin{array}{lll}
+                0 & \mbox{si  } ||h|| = 0 \\ [4pt]
+                c_{0,\varepsilon} + (1-c_{0,\varepsilon}) \left( \frac{3||h||}{2a} - \frac{||h||^2}{2a^2} \right) & \mbox{si } 0 < ||h|| \leq a \\ [4pt]
+                1 & \mbox{si } ||h|| > a
+            \end{array}
+        \right.
+        \]
+    </div>
+    <p>
+        avec \(c_{0,\varepsilon}\) l'effet pépite du champ \(\varepsilon(\cdot)\), \(a\) sa portée et 1 son palier. Le variogramme \(\gamma_Z\) de \(Z(\cdot)\) est :
+    </p>
+    <div class="equation">
+        \[ \gamma_Z = \sigma^2 \gamma_{\varepsilon}. \]
+    </div>
+    <p>
+        Nous avons réalisé \(N = 100\) simulations de \(Z(\cdot)\) avec les paramètres suivants :
+    </p>
+    <div class="equation">
+        \[
+        \left\{
+            \begin{array}{lll}
+                \mu &=& 7 \\ [4pt]
+                a &=& 500 \\ [4pt]
+                c_{0,\varepsilon}&=& 0.45 \\ [4pt]
+                \sigma^2 &=& 10
+            \end{array}
+        \right.
+        \]
+    </div>
+
+    <h3>Simulations non stationnaires : moyenne non constante sur le domaine d'étude</h3>
+    <p>
+        Dans cette partie, on souhaite simuler un champ \(Z(\cdot)\) avec une moyenne non constante. Le modèle pour le champ \(Z(\cdot)\) s'écrit :
+    </p>
+    <div class="equation">
+        \[ \forall s \in \mathbb{R}^2, \,Z(s) = \mu(s) + \sigma \,\varepsilon(s), \]
+    </div>
+    <p>
+        avec \(\mu(\cdot)\) une fonction, \(\sigma > 0\) et \(\varepsilon(\cdot)\) un champ aléatoire gaussien centré satisfaisant les mêmes hypothèses que dans la partie précédente.
+    </p>
+    <p>
+        Le champ simulé pour construire la moyenne \(\mu\) est de moyenne égale à 7 et de variogramme donné par :
+    </p>
+    <div class="equation">
+        \[
+        \gamma_{\mu}(h) = \left\{
+            \begin{array}{lll}
+                0 & \mbox{si  } h = 0, \\
+                c_{\mu}\left(1 - \exp\left(-\frac{||h||}{a_{\mu}}\right)\right)& \mbox{si }   h \ne 0
+            \end{array}
+        \right.
+        \]
+    </div>
+    <p>
+        avec la portée \(a_{\mu} = 2500m\) et le palier \(c_{\mu} = 1\).
+    </p>
+
+    <h3>Simulations non stationnaires : moyenne et variance non constantes sur le domaine d'étude</h3>
+    <p>
+        Dans cette partie, on souhaite simuler un champ \(Z(\cdot)\) avec une moyenne et une variance non constante. Le modèle pour le champ \(Z(\cdot)\) s'écrit :
+    </p>
+    <div class="equation">
+        \[ \forall s \in \mathbb{R}^2,\,  Z(s) = \mu(s) + \sigma(s)\varepsilon(s) \]
+    </div>
+    <p>
+        avec \(\mu\) et \(\sigma\) deux fonctions et \(\epsilon(\cdot)\) un champ gaussien centré.
+    </p>
+    <p>
+        Le champ simulé pour construire l'écart-type \(\sigma\) est de moyenne \(\mu_{\sigma} = \sigma = \sqrt{10}\) et de variogramme donné par :
+    </p>
+    <div class="equation">
+        \[
+        \gamma_{\sigma}(h) = \left\{
+            \begin{array}{lll}
+                0 & \mbox{si  } h = 0 \\
+                c_{\sigma}\left(1 - \exp\left(-\frac{||h||}{a_{\sigma}}\right)\right)& \mbox{si }   h \ne 0 
+            \end{array}
+        \right.
+        \]
+    </div>
+    <p>
+        avec la portée \(a_{\sigma} = 250m\) et le palier \(c_{\sigma} = 1\).
+    </p>
+    <h3>7.1 Erreur de positionnement</h3>
+    <p>
+        L'influence de l'erreur de positionnement est étudiée en supposant que certains points parents sont affectés, avec des taux d'erreur de 10% et 30%. Deux méthodes sont utilisées pour traiter les points enfants :
+    </p>
+    <ol>
+        <li>Sélection d'un point enfant unique (le plus profond)</li>
+        <li>Dispersion dans un disque de rayon R'</li>
+    </ol>
+
+</body>
+</html>

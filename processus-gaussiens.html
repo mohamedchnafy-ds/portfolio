@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Processus Gaussiens - Mohamed Chnafy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- CSS intégré -->
+    <style>
+    /* Copier ici le contenu de style.css */
+    @font-face {
+      font-family: 'icomoon';
+      src: url("../fonts/icomoon/icomoon.eot?srf3rx");
+      src: url("../fonts/icomoon/icomoon.eot?srf3rx#iefix") format("embedded-opentype"), url("../fonts/icomoon/icomoon.ttf?srf3rx") format("truetype"), url("../fonts/icomoon/icomoon.woff?srf3rx") format("woff"), url("../fonts/icomoon/icomoon.svg?srf3rx#icomoon") format("svg");
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    /* Ajouter le reste du contenu de style.css ici */
+    
+    /* Styles spécifiques pour les processus gaussiens */
+    .gp-chart {
+        width: 100%;
+        height: 400px;
+        margin-bottom: 20px;
+    }
+    .code-example {
+        background-color: #f4f4f4;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    </style>
+</head>
+<body>
+    <div id="colorlib-page">
+        <!-- Sidebar/menu -->
+        <aside id="colorlib-aside" role="complementary" class="border js-fullheight">
+            <!-- Copier le contenu du sidebar depuis votre portfolio -->
+        </aside>
+
+        <div id="colorlib-main">
+            <section class="colorlib-about" data-section="about">
+                <div class="colorlib-narrow-content">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row row-bottom-padded-sm animate-box" data-animate-effect="fadeInLeft">
+                                <div class="col-md-12">
+                                    <div class="about-desc">
+                                        <h1 class="colorlib-heading">Processus Gaussiens</h1>
+                                        
+                                        <!-- Contenu du rapport -->
+                                        <h2>Introduction</h2>
+                                        <p>Les processus gaussiens sont des modèles probabilistes flexibles...</p>
+
+                                        <h2>Théorie des Processus Gaussiens</h2>
+                                        <p>Un processus gaussien est une collection de variables aléatoires...</p>
+
+                                        <!-- Graphique interactif -->
+                                        <div id="gpChart" class="gp-chart"></div>
+
+                                        <h2>Implémentation en Python</h2>
+                                        <div class="code-example">
+                                            <pre><code>
+import numpy as np
+
+def kernel(X1, X2, l=1.0, sigma_f=1.0):
+    sqdist = np.sum(X1**2, 1).reshape(-1, 1) + np.sum(X2**2, 1) - 2 * np.dot(X1, X2.T)
+    return sigma_f**2 * np.exp(-0.5 / l**2 * sqdist)
+                                            </code></pre>
+                                        </div>
+
+                                        <!-- Autres sections du rapport -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- JavaScript intégré -->
+    <script>
+    // Copier ici le contenu de jquery.min.js, bootstrap.min.js, et main.js
+    
+    // Code spécifique pour les processus gaussiens
+    (function() {
+        'use strict';
+
+        function initCharts() {
+            // Utiliser Chart.js ou Plotly.js pour créer des graphiques interactifs
+            // Exemple avec Plotly.js (nécessite d'inclure la bibliothèque)
+            var trace1 = {
+                x: [1, 2, 3, 4],
+                y: [10, 15, 13, 17],
+                mode: 'lines+markers',
+                type: 'scatter'
+            };
+
+            var data = [trace1];
+
+            var layout = {
+                title: 'Exemple de Processus Gaussien'
+            };
+
+            Plotly.newPlot('gpChart', data, layout);
+        }
+
+        function initCodeExamples() {
+            // Initialiser les exemples de code (optionnel, peut utiliser une bibliothèque comme Prism.js)
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            initCodeExamples();
+        });
+    })();
+    </script>
+
+    <!-- Inclure Plotly.js pour les graphiques -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</body>
+</html>
